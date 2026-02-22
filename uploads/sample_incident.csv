@@ -1,0 +1,10 @@
+timestamp,service,status_code,message
+2026-02-22 10:00:00,API-Gateway,200,Success
+2026-02-22 10:01:00,API-Gateway,200,Success
+2026-02-22 10:02:00,API-Gateway,500,Database Connection Timeout
+2026-02-22 10:02:05,API-Gateway,500,Database Connection Timeout
+2026-02-22 10:02:10,Auth-Service,500,Unable to reach DB
+2026-02-22 10:03:00,API-Gateway,500,Database Connection Timeout
+2026-02-22 10:04:00,API-Gateway,500,Database Connection Timeout
+2026-02-22 10:05:00,API-Gateway,200,Success
+2026-02-22 10:06:00,API-Gateway,200,Success

@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rca-system
+  labels:
+    app: rca-system
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: rca-system
+  template:
+    metadata:
+      labels:
+        app: rca-system
+    spec:
+      containers:
+      - name: rca-system
+        image: rca-system:latest  # Note: Ensure image is in a registry Reachable by K8s
+        ports:
+        - containerPort: 5000
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+        volumeMounts:
+        - name: data-storage
+          mountPath: /app/data
+        - name: export-storage
+          mountPath: /app/exports
+      volumes:
+      - name: data-storage
+        persistentVolumeClaim:
+          claimName: rca-data-pvc
+      - name: export-storage
+        emptyDir: {}  # Exports can be transient or use another PVC

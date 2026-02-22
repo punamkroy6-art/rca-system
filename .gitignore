@@ -1,0 +1,26 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+env/
+venv/
+ENV/
+
+# Data and report directories
+uploads/
+exports/
+data/reports/
+data/*.json
+
+# Large CSV files (stress test data)
+stress_test_20k.csv
+
+# Test artifacts
+final_visual_test.xlsx
+visual_report_test.pdf
+test_report.xlsx
+
+# OS files
+.DS_Store
+Thumbs.db

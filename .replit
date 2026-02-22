@@ -1,0 +1,14 @@
+run = "python app.py"
+entrypoint = "app.py"
+
+[nix]
+channel = "stable-23_11"
+
+[packager]
+language = "python3"
+
+[env]
+PYTHONPATH = "."
+
+[interpreter]
+py3 = "python3"

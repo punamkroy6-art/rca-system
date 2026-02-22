@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }} | AI Ops Center</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Outfit:wght@500;700&family=JetBrains+Mono&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <div class="app-container">
+        <header>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h1>AI Analyst <span
+                            style="font-size: 1rem; color: var(--text-muted); font-weight: 500;">v2.0</span></h1>
+                    <p class="sub-header">Autonomous Root Cause Analysis & Insight Engine</p>
+                </div>
+                <div class="status-indicator">
+                    <span class="pulse"></span> System Ready
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <div class="upload-zone" id="drop-zone">
+                <div class="upload-content">
+                    <div class="upload-icon">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline points="17 8 12 3 7 8" />
+                            <line x1="12" y1="3" x2="12" y2="15" />
+                        </svg>
+                    </div>
+                    <h2>Deploy Incident Data</h2>
+                    <p>Drag and drop logs, CSV, or Excel files for autonomous analysis.</p>
+                    <input type="file" id="file-input" hidden accept=".csv,.xlsx,.xls,.json">
+                    <button class="btn-primary" onclick="document.getElementById('file-input').click()"
+                        style="width: auto; padding: 12px 32px;">Select File</button>
+                    <p class="file-limits">Supported: CSV, XLSX, JSON (Max 16MB)</p>
+                </div>
+            </div>
+
+            <div id="processing-stage" class="hidden">
+                <div class="stage-container">
+                    <div class="stage-item" id="stage-upload">
+                        <div class="stage-status"></div>
+                        <div class="stage-label">Data Upload</div>
+                    </div>
+                    <div class="stage-item" id="stage-validation">
+                        <div class="stage-status"></div>
+                        <div class="stage-label">Validation</div>
+                    </div>
+                    <div class="stage-item" id="stage-analysis">
+                        <div class="stage-status"></div>
+                        <div class="stage-label">AI Agent Analysis</div>
+                    </div>
+                    <div class="stage-item" id="stage-insight">
+                        <div class="stage-status"></div>
+                        <div class="stage-label">Insight Generation</div>
+                    </div>
+                </div>
+                <div class="terminal-view">
+                    <div class="terminal-header">Analysis Log</div>
+                    <div class="terminal-body" id="log-output">
+                        > Initializing AI Agent...
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const processingStage = document.getElementById('processing-stage');
+        const logOutput = document.getElementById('log-output');
+
+        function addLog(msg) {
+            const div = document.createElement('div');
+            div.textContent = `> ${msg}`;
+            logOutput.appendChild(div);
+            logOutput.scrollTop = logOutput.scrollHeight;
+        }
+
+        function setStageState(id, state) {
+            const el = document.getElementById(id);
+            el.className = `stage-item ${state}`;
+        }
+
+        async function handleUpload(file) {
+            dropZone.classList.add('hidden');
+            processingStage.classList.remove('hidden');
+
+            addLog(`Received file: ${file.name}`);
+            setStageState('stage-upload', 'active');
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                addLog("Uploading to AI Ops Center...");
+                setTimeout(() => setStageState('stage-upload', 'completed'), 1000);
+                setTimeout(() => setStageState('stage-validation', 'active'), 1200);
+
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    addLog("Validation successful. Format: " + file.name.split('.').pop().toUpperCase());
+                    setStageState('stage-validation', 'completed');
+
+                    addLog("Starting AI Agent Analysis deep dive...");
+                    setStageState('stage-analysis', 'active');
+
+                    setTimeout(() => {
+                        setStageState('stage-analysis', 'completed');
+                        addLog("Extracting anomalies and root causes...");
+                        setStageState('stage-insight', 'active');
+
+                        setTimeout(() => {
+                            setStageState('stage-insight', 'completed');
+                            addLog("Insights generated. Redirecting to Dashboard...");
+
+                            // Store results in session storage for the prototype dashboard
+                            sessionStorage.setItem('rca_results', JSON.stringify(result));
+                            setTimeout(() => {
+                                window.location.href = '/dashboard';
+                            }, 500); // Reduced delay for better UX
+                        }, 800);
+                    }, 1000);
+                } else {
+                    addLog("ERROR: " + (result.message || result.error || "Autonomous override failed"));
+                    setStageState('stage-validation', 'error');
+                }
+            } catch (err) {
+                addLog("CRITICAL ERROR: Connection failure.");
+            }
+        }
+
+        fileInput.addEventListener('change', (e) => handleUpload(e.target.files[0]));
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('drag-active');
+        });
+
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-active'));
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('drag-active');
+            handleUpload(e.dataTransfer.files[0]);
+        });
+    </script>
+</body>
+
+</html>

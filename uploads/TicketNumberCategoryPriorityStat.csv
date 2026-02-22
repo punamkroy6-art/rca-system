@@ -1,0 +1,43 @@
+TicketNumber,Category,Priority,Status,ShortDescription,AssignmentGroup,OpenedBy,CreatedDate
+INC0001,Access Management,High,Open,User locked out of account,Service Desk,UserA,2026-01-22
+INC0002,Access Management,Medium,Resolved,Password reset request,Service Desk,UserB,2026-01-22
+INC0003,Access Management,High,Open,SSO not working,Service Desk,UserC,2026-01-23
+INC0004,Access Management,Medium,In Progress,Account disabled unexpectedly,Service Desk,UserD,2026-01-23
+INC0005,Access Management,High,Open,Multi-factor authentication failure,Service Desk,UserE,2026-01-24
+...
+INC0076,Access Management,Medium,Resolved,Shared drive access issue,Service Desk,UserZ,2026-02-05
+INC0077,Software,High,Open,MS Teams crashing,App Support,UserA,2026-01-22
+INC0078,Software,Medium,Open,Outlook not sending emails,App Support,UserB,2026-01-23
+INC0079,Software,High,In Progress,ERP system slow,App Support,UserC,2026-01-23
+...
+INC0146,Software,Medium,Resolved,Zoom update required,App Support,UserZ,2026-02-06
+INC0147,Network,High,Open,VPN not connecting,Network Ops,UserA,2026-01-22
+INC0148,Network,Medium,Resolved,Slow WiFi in office,Network Ops,UserB,2026-01-23
+INC0149,Network,High,Open,Firewall blocking site,Network Ops,UserC,2026-01-23
+...
+INC0212,Network,Medium,In Progress,VoIP call drops,Network Ops,UserZ,2026-02-07
+INC0213,VPN,High,Open,VPN disconnecting every hour,Network Ops,UserA,2026-01-22
+INC0214,VPN,Medium,In Progress,Cannot connect to VPN,Network Ops,UserB,2026-01-23
+INC0215,VPN,High,Open,VPN authentication failing,Network Ops,UserC,2026-01-23
+...
+INC0276,VPN,Medium,Resolved,Remote access timeout,Network Ops,UserZ,2026-02-08
+INC0277,Database,High,Open,Database query taking too long,DB Admins,UserA,2026-01-22
+INC0278,Database,Medium,Resolved,Cannot connect to DB server,DB Admins,UserB,2026-01-23
+INC0279,Database,High,Open,Deadlock errors,DB Admins,UserC,2026-01-23
+...
+INC0340,Database,Medium,In Progress,Transaction table scan issue,DB Admins,UserZ,2026-02-09
+INC0341,Security,High,Open,Antivirus update failing,Security Team,UserA,2026-01-22
+INC0342,Security,Medium,In Progress,Unauthorized login attempt,Security Team,UserB,2026-01-23
+INC0343,Security,High,Open,Phishing email reported,Security Team,UserC,2026-01-23
+...
+INC0401,Security,Medium,Resolved,Firewall misconfiguration,Security Team,UserZ,2026-02-10
+INC0402,Hardware,Medium,Resolved,Laptop overheating,IT Support,UserA,2026-01-22
+INC0403,Hardware,Low,Open,Mouse not working,IT Support,UserB,2026-01-23
+INC0404,Hardware,High,Open,Monitor flickering,IT Support,UserC,2026-01-23
+...
+INC0452,Hardware,Medium,In Progress,Keyboard replacement,IT Support,UserZ,2026-02-11
+INC0453,Email,High,Open,Email not syncing on mobile,Service Desk,UserA,2026-01-22
+INC0454,Email,Medium,Resolved,Unable to send attachments,Service Desk,UserB,2026-01-23
+INC0455,Email,High,Open,Spam filter blocking valid emails,Service Desk,UserC,2026-01-23
+...
+INC0500,Email,Medium,In Progress,Shared mailbox access issue,Service Desk,UserZ,2026-02-12

@@ -1,0 +1,18 @@
+timestamp,service,status,message
+2023-10-01 10:00:00,API-Gateway,200,Request processed
+2023-10-01 10:00:05,Auth-Service,200,User authenticated
+2023-10-01 10:01:10,Auth-Service,401,Invalid token
+2023-10-01 10:01:20,API-Gateway,200,Request processed
+2023-10-01 10:02:00,Payment-Processor,500,Timeout connecting to bank
+2023-10-01 10:02:05,Payment-Processor,500,Internal Server Error
+2023-10-01 10:02:10,Payment-Processor,500,Internal Server Error
+2023-10-01 10:02:15,Payment-Processor,500,Internal Server Error
+2023-10-01 10:02:20,API-Gateway,500,Upstream failure
+2023-10-01 10:03:00,DB-Cluster,200,Query successful
+2023-10-01 10:03:30,Payment-Processor,200,Recovery successful
+2023-10-01 10:04:00,Auth-Service,200,User authenticated
+2023-10-01 10:04:10,DB-Cluster,200,Query successful
+2023-10-01 10:05:00,API-Gateway,200,Request processed
+2023-10-01 10:05:30,DB-Cluster,500,Connection pool exhausted
+2023-10-01 10:05:35,DB-Cluster,500,Connection pool exhausted
+2023-10-01 10:06:00,API-Gateway,500,Database error

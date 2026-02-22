@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RCA Report: {{ report.incident_title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Outfit:wght@600;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body class="report-body">
+    <div class="no-print"
+        style="max-width: 850px; margin: 0 auto 20px auto; display: flex; justify-content: space-between; align-items: center;">
+        <a href="/" style="color: var(--primary-color); text-decoration: none; font-weight: 600;">&larr; Back to
+            Editor</a>
+        <button onclick="window.print()" class="btn-primary" style="width: auto; margin: 0; padding: 10px 20px;">Save as
+            PDF / Print</button>
+    </div>
+
+    <div class="report-paper">
+        <header class="report-header">
+            <div class="report-title-block">
+                <p style="font-weight: 700; color: var(--primary-color); margin-bottom: 5px; font-family: 'Outfit';">
+                    INTERNAL USE ONLY</p>
+                <h1>Root Cause Analysis</h1>
+                <p style="font-size: 1.1rem; color: #64748b; font-weight: 600;">{{ report.incident_title }}</p>
+            </div>
+            <div class="report-meta">
+                <p><strong>REPORT ID:</strong> {{ report.report_id }}</p>
+                <p><strong>GENERATED:</strong> {{ report.generation_date }}</p>
+            </div>
+        </header>
+
+        <section>
+            <h2 class="section-title">Executive Summary</h2>
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="label">Status</span>
+                    <span class="value">{{ report.status }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Severity</span>
+                    <span class="value severity-pill severity-{{ report.severity|lower }}">{{ report.severity }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Detection Time</span>
+                    <span class="value">{{ report.date_detected }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Resolution Time</span>
+                    <span class="value">{{ report.date_resolved or 'N/A' }}</span>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2 class="section-title">1. Problem Statement</h2>
+            <p style="white-space: pre-wrap;">{{ report.problem_statement }}</p>
+        </section>
+
+        <section>
+            <h2 class="section-title">2. Impact Analysis</h2>
+            <p style="white-space: pre-wrap;">{{ report.impact_analysis }}</p>
+        </section>
+
+        {% if report.timeline %}
+        <section>
+            <h2 class="section-title">3. Timeline of Events</h2>
+            <table class="timeline-table">
+                <thead>
+                    <tr>
+                        <th style="width: 25%;">Timestamp</th>
+                        <th>Event Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for event in report.timeline %}
+                    <tr>
+                        <td><strong>{{ event.time }}</strong></td>
+                        <td>{{ event.description }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+        {% endif %}
+
+        <section>
+            <h2 class="section-title">4. Root Cause Analysis</h2>
+            <p style="white-space: pre-wrap;">{{ report.root_causes }}</p>
+        </section>
+
+        <section>
+            <h2 class="section-title">5. Action Items</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+                <div>
+                    <h3 style="font-size: 0.9rem; margin-bottom: 10px; color: #64748b;">Corrective Actions</h3>
+                    <p style="white-space: pre-wrap; font-size: 0.95rem;">{{ report.corrective_actions }}</p>
+                </div>
+                <div>
+                    <h3 style="font-size: 0.9rem; margin-bottom: 10px; color: #64748b;">Preventative Recommendations
+                    </h3>
+                    <p style="white-space: pre-wrap; font-size: 0.95rem;">{{ report.preventative_measures }}</p>
+                </div>
+            </div>
+        </section>
+
+        <footer class="footer">
+            <div>
+                <p><strong>PREPARED BY:</strong> {{ report.author }}</p>
+            </div>
+            <div>
+                <p>Page 1 of 1</p>
+            </div>
+        </footer>
+    </div>
+</body>
+
+</html>

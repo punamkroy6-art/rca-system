@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis Dashboard | AI Ops Center</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Outfit:wght@600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div class="app-container">
+        <header style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <a href="/"
+                    style="color: var(--primary-color); text-decoration: none; font-size: 0.9rem; font-weight: 600;">&larr;
+                    Back to Upload</a>
+                <h1 id="incident-title" style="margin-top: 10px;">Incident Analysis Dashboard</h1>
+                <p class="sub-header" id="report-meta">Loading analysis results...</p>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-primary" style="width: auto; background: var(--success-green); border: none;"
+                    onclick="exportData('excel')">Export Excel</button>
+                <button class="btn-primary" style="width: auto; background: #ea580c; border: none;"
+                    onclick="exportData('pdf')">Export PDF</button>
+            </div>
+        </header>
+
+        <main>
+            <div class="stage-container" style="grid-template-columns: repeat(3, 1fr);">
+                <div class="stage-item completed">
+                    <div class="stage-label">Total Logs</div>
+                    <div id="total-records" style="font-size: 2rem; font-weight: 800; margin-top: 10px;">0</div>
+                </div>
+                <div class="stage-item completed">
+                    <div class="stage-label">AI Confidence</div>
+                    <div id="confidence" style="font-size: 2rem; font-weight: 800; margin-top: 10px;">0%</div>
+                </div>
+                <div class="stage-item completed">
+                    <div class="stage-label">Status</div>
+                    <div id="status"
+                        style="font-size: 1.2rem; font-weight: 800; margin-top: 10px; color: var(--success-green);">
+                        VERIFIED</div>
+                </div>
+            </div>
+
+            <div class="form-card" style="margin-bottom: 30px;">
+                <h2
+                    style="font-size: 1.2rem; margin-bottom: 20px; color: var(--primary-color); display: flex; align-items: center; gap: 10px;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path
+                            d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                    </svg>
+                    AI Agent Conclusion
+                </h2>
+                <div id="root-cause" style="font-size: 1.3rem; font-weight: 600; line-height: 1.4;">
+                    Analyzing root cause patterns...
+                </div>
+            </div>
+
+            <div class="form-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 30px;">
+                <div class="form-card">
+                    <h3 style="font-size: 1rem; margin-bottom: 20px;">Service Reliability Matrix (Status x Service)</h3>
+                    <canvas id="matrix-chart" style="max-height: 300px;"></canvas>
+                </div>
+                <div class="form-card">
+                    <h3 style="font-size: 1rem; margin-bottom: 20px;">Service Health Radar (Impact Scoring)</h3>
+                    <canvas id="radar-chart" style="max-height: 300px;"></canvas>
+                </div>
+            </div>
+
+            <div class="form-grid" style="grid-template-columns: 2fr 1fr; margin-bottom: 30px;">
+                <div class="form-card">
+                    <h3 style="font-size: 1rem; margin-bottom: 20px;">Incident Timeline (Log Frequency)</h3>
+                    <canvas id="timeline-chart" style="max-height: 250px;"></canvas>
+                </div>
+                <div class="form-card">
+                    <h3 style="font-size: 1rem; margin-bottom: 20px;">AI Recommendations</h3>
+                    <div id="recommendations-list">
+                        <!-- Recommendations injected here -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-card">
+                    <h3 style="font-size: 1rem; margin-bottom: 20px;">Detected Anomalies</h3>
+                    <div id="anomalies-list">
+                        <!-- Anomalies will be injected here -->
+                    </div>
+                </div>
+                <div class="form-card">
+                    <h3 style="font-size: 1rem; margin-bottom: 20px;">Volume Distribution</h3>
+                    <canvas id="distribution-chart"></canvas>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Fetch results from sessionStorage (populated by index.html after upload)
+        const results = JSON.parse(sessionStorage.getItem('rca_results'));
+
+        if (results) {
+            document.getElementById('incident-title').textContent = "RCA: " + (results.filename || "Incident Analysis");
+            document.getElementById('report-meta').textContent = `${results.report_id} | Analyzed on ${results.date}`;
+            document.getElementById('total-records').textContent = results.total_records.toLocaleString();
+            document.getElementById('confidence').textContent = results.confidence_score + "%";
+            document.getElementById('root-cause').textContent = results.root_cause_prediction;
+
+            // Render Anomalies
+            const anomaliesDiv = document.getElementById('anomalies-list');
+            if (results.anomalies && results.anomalies.length > 0) {
+                results.anomalies.forEach(a => {
+                    const div = document.createElement('div');
+                    div.className = "anomaly-item";
+                    div.style.padding = "12px";
+                    div.style.background = "rgba(239, 68, 68, 0.1)";
+                    div.style.color = "#fca5a5";
+                    div.style.borderRadius = "8px";
+                    div.style.marginBottom = "10px";
+                    div.style.fontSize = "0.9rem";
+                    div.style.borderLeft = "4px solid #ef4444";
+                    div.textContent = a;
+                    anomaliesDiv.appendChild(div);
+                });
+            } else {
+                anomaliesDiv.textContent = "No significant anomalies detected.";
+            }
+
+            // Render Recommendations
+            const recoDiv = document.getElementById('recommendations-list');
+            if (results.recommendations && results.recommendations.length > 0) {
+                results.recommendations.forEach(r => {
+                    const div = document.createElement('div');
+                    div.style.padding = "10px";
+                    div.style.background = "rgba(16, 185, 129, 0.1)";
+                    div.style.color = "#6ee7b7";
+                    div.style.borderRadius = "6px";
+                    div.style.marginBottom = "8px";
+                    div.style.fontSize = "0.85rem";
+                    div.style.borderLeft = "3px solid #10b981";
+                    div.textContent = "⚡ " + r;
+                    recoDiv.appendChild(div);
+                });
+            }
+
+            // --- Extended Visualization: Service Matrix ---
+            if (results.service_matrix) {
+                const ctx = document.getElementById('matrix-chart').getContext('2d');
+                const services = Object.keys(results.service_matrix);
+                const statuses = [...new Set(services.flatMap(s => Object.keys(results.service_matrix[s])))];
+                const colors = ['#ef4444', '#f59e0b', '#3b82f6', '#10b981', '#6366f1'];
+
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: services,
+                        datasets: statuses.map((status, idx) => ({
+                            label: status,
+                            data: services.map(s => results.service_matrix[s][status] || 0),
+                            backgroundColor: colors[idx % colors.length]
+                        }))
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        scales: { x: { stacked: true, grid: { color: 'rgba(255,255,255,0.05)' } }, y: { stacked: true, grid: { display: false } } },
+                        plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', boxWidth: 10 } } }
+                    }
+                });
+            }
+
+            // --- Extended Visualization: Health Radar ---
+            const rtx = document.getElementById('radar-chart').getContext('2d');
+            if (results.impact_scores && Object.keys(results.impact_scores).length >= 3) {
+                new Chart(rtx, {
+                    type: 'radar',
+                    data: {
+                        labels: Object.keys(results.impact_scores),
+                        datasets: [{
+                            label: 'Impact Score (0-10)',
+                            data: Object.values(results.impact_scores),
+                            borderColor: '#ef4444',
+                            backgroundColor: 'rgba(239, 68, 68, 0.2)',
+                            pointBackgroundColor: '#ef4444'
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            r: {
+                                grid: { color: 'rgba(255,255,255,0.1)' },
+                                angleLines: { color: 'rgba(255,255,255,0.1)' },
+                                ticks: { backdropColor: 'transparent', color: '#94a3b8', stepSize: 2 },
+                                pointLabels: { color: '#94a3b8' },
+                                suggestMin: 0,
+                                suggestMax: 10
+                            }
+                        },
+                        plugins: { legend: { display: false } }
+                    }
+                });
+            } else {
+                // Clear radar if not enough points
+                rtx.font = "12px Inter";
+                rtx.fillStyle = "#94a3b8";
+                rtx.textAlign = "center";
+                rtx.fillText("Insufficient service diversity for radar analysis", 150, 150);
+            }
+
+            // Render Distribution Chart
+            if (results.top_contributors) {
+                const ctx = document.getElementById('distribution-chart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: Object.keys(results.top_contributors),
+                        datasets: [{
+                            data: Object.values(results.top_contributors),
+                            backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#6366f1', '#ec4899', '#8b5cf6', '#06b6d4'],
+                            borderColor: '#1e293b',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        cutout: '70%',
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: { color: '#94a3b8', font: { family: 'Inter', size: 10 }, boxWidth: 8 }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Render Timeline Chart
+            if (results.time_series && results.time_series.labels) {
+                const ttx = document.getElementById('timeline-chart').getContext('2d');
+                new Chart(ttx, {
+                    type: 'line',
+                    data: {
+                        labels: results.time_series.labels,
+                        datasets: [{
+                            label: 'Incidents Captured',
+                            data: results.time_series.counts,
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            fill: true,
+                            tension: 0.3,
+                            pointRadius: results.time_series.labels.length > 50 ? 0 : 3,
+                            pointHitRadius: 10,
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: 'rgba(255,255,255,0.05)' },
+                                ticks: { color: '#94a3b8' }
+                            },
+                            x: {
+                                grid: { display: false },
+                                ticks: {
+                                    color: '#94a3b8',
+                                    maxRotation: 0,
+                                    autoSkip: true,
+                                    maxTicksLimit: 8
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: '#0f172a',
+                                titleColor: '#3b82f6',
+                                bodyColor: '#f8fafc',
+                                borderColor: 'rgba(59, 130, 246, 0.2)',
+                                borderWidth: 1
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        function exportData(format) {
+            const reportId = results.report_id;
+            window.location.href = `/export/${format}/${reportId}`;
+        }
+    </script>
+</body>
+
+</html>

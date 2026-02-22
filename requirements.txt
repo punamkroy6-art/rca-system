@@ -1,0 +1,8 @@
+flask
+pandas
+openpyxl
+fpdf2
+jinja2
+matplotlib
+gunicorn
+werkzeug
